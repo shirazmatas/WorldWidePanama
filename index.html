@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Panama Nation — a Minecraft nation website with Discord login, blog, shop feed, and dynmap." />
+  <meta name="description" content="Panama Nation — a Minecraft nation website with Discord login, blog posts, shop feed, and dynmap." />
   <title>Panama Nation | Minecraft server</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
 
       <nav class="nav-links" aria-label="Primary">
         <a href="#blog">Blog</a>
-        <a href="#shops">Live shops</a>
+        <a href="#shops">Shops</a>
         <a href="#map">Dynmap</a>
       </nav>
 
@@ -34,16 +34,16 @@
   </header>
 
   <main id="top">
-    <section class="hero">
-      <div class="hero-copy">
+    <section class="fold">
+      <div class="textwrap">
         <p class="eyebrow">Nation site for Panama on the server</p>
         <h1>Build Panama into a lasting power.</h1>
-        <p class="lead">
-          A clean home page for your nation with Discord authentication, blog posts,
-          a live shop feed, and a dynmap view of your territory.
+        <p>
+          A dark, card-forward homepage inspired by the main server site. Use this layout for
+          announcements, diplomacy, live shop data, and territorial updates.
         </p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="/auth/discord">Login with Discord</a>
+          <a class="ip-button" href="/auth/discord">Login with Discord</a>
           <a class="btn btn-secondary" href="#map">View dynmap</a>
         </div>
         <dl class="stats">
@@ -61,51 +61,23 @@
           </div>
         </dl>
       </div>
-
-      <div class="hero-panel">
-        <div class="panel-card">
-          <p class="panel-label">Latest update</p>
-          <h2>Fortify the capital, grow trade, and coordinate through Discord.</h2>
-          <p>
-            Use this space for server announcements, recruitment, alliances, or a
-            short nation manifesto.
-          </p>
-        </div>
-        <div class="panel-grid">
-          <article>
-            <span>Blog</span>
-            <strong>News and events</strong>
-          </article>
-          <article>
-            <span>Shops</span>
-            <strong>Market activity</strong>
-          </article>
-          <article>
-            <span>Map</span>
-            <strong>Dynmap coverage</strong>
-          </article>
-          <article>
-            <span>Login</span>
-            <strong>Discord auth</strong>
-          </article>
-        </div>
-      </div>
     </section>
 
     <section class="feature-block">
       <div class="feature-media art-flag">
-        <div class="flag">
+        <div class="flag" aria-hidden="true">
           <span class="flag-blue"></span>
           <span class="flag-white"></span>
           <span class="flag-green"></span>
         </div>
       </div>
-      <div class="feature-copy">
-        <h2>Expand your nation with structure</h2>
+      <div class="featuretext">
+        <p class="eyebrow">Overview</p>
+        <h2>Match the main site’s tone with a cleaner nation identity.</h2>
         <p>
-          Match the main site’s dark, bold, card-heavy style while keeping the layout
-          focused on your own nation. This section is a good place to explain your rules,
-          claim policy, or goals for Panama.
+          This section is a good place to describe claims, structure, and the goals for Panama.
+          Keep the copy short and concrete so it reads like a server front page rather than a
+          generic landing page.
         </p>
       </div>
     </section>
@@ -115,16 +87,17 @@
         <div class="mock-feed">
           <div class="mock-feed-header">
             <span>Live shop feed</span>
-            <span class="dot live"></span>
+            <span class="dot live" aria-hidden="true"></span>
           </div>
           <div id="shops" class="feed-list" aria-live="polite"></div>
         </div>
       </div>
       <div class="feature-copy">
-        <h2>Show live shop data in one place</h2>
+        <p class="eyebrow">Shops</p>
+        <h2>Show live market data in one place.</h2>
         <p>
-          This panel is wired for a live feed. Replace the sample data with your in-game
-          shop source and it can display items, prices, stock, and owner.
+          Replace the sample items with your actual in-game source and keep prices, stock, and
+          owners visible without pushing users into a separate page.
         </p>
       </div>
     </section>
@@ -171,6 +144,15 @@
           </div>
         </div>
       </article>
+    </section>
+
+    <section class="join">
+      <p class="eyebrow">Discord</p>
+      <h2>Login, coordinate, and keep the nation active.</h2>
+      <p>
+        The profile page will verify Discord access and the nation role against your guild.
+      </p>
+      <a href="/auth/discord">Login with Discord</a>
     </section>
   </main>
 
