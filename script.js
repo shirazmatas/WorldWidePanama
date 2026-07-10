@@ -22,6 +22,8 @@ const shops = [
   },
 ];
 
+const minecraftIp = "shirazmatas.earthmc.net";
+const connectButton = document.getElementById("connect-button");
 const feed = document.getElementById("shops");
 const authSlot = document.getElementById("auth-slot");
 
@@ -49,6 +51,21 @@ if (feed) {
       `,
     )
     .join("");
+}
+
+if (connectButton) {
+  connectButton.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(connectButton.dataset.copyText || minecraftIp);
+      const originalLabel = connectButton.textContent;
+      connectButton.textContent = "Copied to clipboard";
+      setTimeout(() => {
+        connectButton.textContent = originalLabel;
+      }, 1800);
+    } catch {
+      window.prompt("Copy this Minecraft server address:", connectButton.dataset.copyText || minecraftIp);
+    }
+  });
 }
 
 function avatarUrl(user) {
