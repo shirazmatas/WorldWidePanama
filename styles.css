@@ -132,6 +132,48 @@ main {
   background: rgba(255, 255, 255, 0.03);
 }
 
+.auth-slot {
+  display: flex;
+  align-items: center;
+}
+
+.auth-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.auth-user img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: block;
+}
+
+.auth-user div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.auth-user strong {
+  font-size: 0.95rem;
+}
+
+.auth-user small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.auth-logout {
+  min-height: 36px;
+  padding: 0 14px;
+}
+
 .hero {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
