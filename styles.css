@@ -303,6 +303,26 @@ main {
   padding: 24px 0 48px;
 }
 
+body.laws-page-shell {
+  background: var(--bg);
+}
+
+body.laws-page-shell main {
+  width: min(var(--content-width), calc(100% - 16px));
+}
+
+body.laws-page-shell .laws-page {
+  gap: 20px;
+  padding: 20px 0 40px;
+}
+
+body.laws-page-shell .card,
+body.laws-page-shell .law-card,
+body.laws-page-shell .laws-hero {
+  border: 0;
+  background: rgba(255, 255, 255, 0.03);
+}
+
 .laws-hero {
   padding: 28px;
 }
@@ -585,26 +605,12 @@ main {
   padding: 28px;
 }
 
-.flag {
+.flag-asset {
   width: min(100%, 420px);
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  height: auto;
+  display: block;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #0f172a;
-}
-
-.flag-blue {
-  background: linear-gradient(180deg, #0b4da2, #07347a);
-}
-
-.flag-white {
-  background: linear-gradient(180deg, #efefef, #cfd5de);
-}
-
-.flag-green {
-  background: linear-gradient(180deg, #166534, #0b3d2a);
+  background: #fff;
 }
 
 .panel-card {
