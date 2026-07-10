@@ -374,13 +374,75 @@ main {
   margin-top: 8px;
 }
 
-.gov-hierarchy {
+.org-chart {
   display: grid;
-  gap: 14px;
+  gap: 24px;
   padding: 0 24px 24px;
 }
 
-.gov-node,
+.org-top {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 24px;
+}
+
+.org-top::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.org-middle {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: start;
+  padding-top: 18px;
+}
+
+.org-middle::before {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.org-column {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.org-column-left {
+  padding-right: 16px;
+}
+
+.org-column-right {
+  padding-left: 16px;
+}
+
+.org-chain {
+  display: grid;
+  gap: 12px;
+  padding-left: 22px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.org-chain-ministers {
+  margin-top: 4px;
+}
+
+.org-node,
 .gov-node-top {
   display: grid;
   gap: 6px;
@@ -390,12 +452,12 @@ main {
   border-radius: var(--radius);
 }
 
-.gov-node strong,
+.org-node strong,
 .gov-node-top strong {
   font-size: 1.02rem;
 }
 
-.gov-node span,
+.org-node span,
 .gov-node-top span,
 .gov-notes p {
   color: var(--muted);
@@ -407,17 +469,17 @@ main {
   background: linear-gradient(180deg, rgba(255, 220, 115, 0.09), rgba(255, 255, 255, 0.03));
 }
 
-.gov-branch {
-  display: grid;
-  gap: 14px;
-  padding-left: 18px;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
+.king-node {
+  min-width: min(100%, 320px);
+  text-align: center;
 }
 
-.gov-branch-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+.parliament-node {
+  background: linear-gradient(180deg, rgba(0, 204, 130, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.pm-node {
+  background: linear-gradient(180deg, rgba(255, 220, 115, 0.08), rgba(255, 255, 255, 0.03));
 }
 
 .gov-notes {
@@ -428,6 +490,21 @@ main {
   margin: 0;
   max-width: 920px;
   line-height: 1.75;
+}
+
+@media (max-width: 960px) {
+  .org-middle {
+    grid-template-columns: 1fr;
+  }
+
+  .org-column-left,
+  .org-column-right {
+    padding: 0;
+  }
+
+  .org-chain {
+    padding-left: 16px;
+  }
 }
 
 .stats {

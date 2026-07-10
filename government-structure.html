@@ -51,182 +51,62 @@
         <p class="eyebrow">Hierarchy</p>
         <h2>How power flows through the nation</h2>
       </div>
-      <div class="gov-hierarchy" aria-label="Government hierarchy">
-        <div class="gov-node gov-node-top">
-          <strong>King</strong>
-          <span>Final approval on major decisions</span>
-        </div>
-        <div class="gov-branch">
-          <div class="gov-node">
-            <strong>Prime Minister</strong>
-            <span>Coordinates ministers and escalates citizen concerns</span>
-          </div>
-          <div class="gov-branch-row">
-            <div class="gov-node">
-              <strong>Minister of Finance</strong>
-              <span>Budget, grants, and loans</span>
-            </div>
-            <div class="gov-node">
-              <strong>Minister of Public Works</strong>
-              <span>Jobs, assignments, and pay</span>
-            </div>
-            <div class="gov-node">
-              <strong>Minister of Construction</strong>
-              <span>City plans, plots, and materials</span>
-            </div>
-            <div class="gov-node">
-              <strong>Minister of Foreign Affairs</strong>
-              <span>Diplomatic relations with other nations</span>
-            </div>
+      <div class="org-chart" aria-label="Government organization chart">
+        <div class="org-top">
+          <div class="gov-node gov-node-top org-node king-node">
+            <strong>King</strong>
+            <span>Oversees the Prime Minister and gives final approval on major decisions</span>
           </div>
         </div>
-        <div class="gov-branch">
-          <div class="gov-node">
-            <strong>Parliament Members</strong>
-            <span>Appointed by Mayors and eligible for minister roles</span>
+
+        <div class="org-middle">
+          <div class="org-column org-column-left">
+            <div class="gov-node org-node parliament-node">
+              <strong>Parliament</strong>
+              <span>Parliament Members / MEPs are appointed by Mayors and can become Ministers</span>
+            </div>
+            <div class="org-chain">
+              <div class="gov-node org-node mayor-node">
+                <strong>Mayors</strong>
+                <span>Own towns and appoint citizens to Parliament</span>
+              </div>
+              <div class="gov-node org-node mep-node">
+                <strong>MEPs</strong>
+                <span>Town representatives with access to Minister roles</span>
+              </div>
+              <div class="gov-node org-node citizens-node">
+                <strong>Citizens</strong>
+                <span>Vote, grow towns, and help create stronger representation</span>
+              </div>
+            </div>
           </div>
-          <div class="gov-node">
-            <strong>Mayor</strong>
-            <span>Owns the town and appoints Parliament Members</span>
-          </div>
-          <div class="gov-node">
-            <strong>Citizens</strong>
-            <span>Vote, grow towns, and earn Parliament seats</span>
+
+          <div class="org-column org-column-right">
+            <div class="gov-node org-node pm-node">
+              <strong>Prime Minister</strong>
+              <span>Ensures Ministers are doing their jobs and hears suggestions from Mayors and Citizens</span>
+            </div>
+            <div class="org-chain org-chain-ministers">
+              <div class="gov-node org-node minister-node">
+                <strong>Minister of Finance</strong>
+                <span>Manages money, budget, grants, and loans</span>
+              </div>
+              <div class="gov-node org-node minister-node">
+                <strong>Minister of Public Works</strong>
+                <span>Creates jobs, assigns work, and sets pay</span>
+              </div>
+              <div class="gov-node org-node minister-node">
+                <strong>Minister of Construction</strong>
+                <span>Builds the City Plan and allocates materials</span>
+              </div>
+              <div class="gov-node org-node minister-node">
+                <strong>Minister of Foreign Affairs</strong>
+                <span>Manages relations with other nations</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </section>
-
-    <section class="laws-list" aria-label="Government roles">
-      <article class="card law-card">
-        <div class="law-head">
-          <div>
-            <p class="law-marker">Role 1</p>
-            <h2 class="law-title">King</h2>
-          </div>
-          <p class="law-meta">Head of state</p>
-        </div>
-        <div class="law-body">
-          <p>
-            Oversees the Prime Minister, makes sure the nation is improving, and keeps every
-            ministry pointed in the right direction. The King also gives final approval on major
-            decisions.
-          </p>
-        </div>
-      </article>
-
-      <article class="card law-card">
-        <div class="law-head">
-          <div>
-            <p class="law-marker">Role 2</p>
-            <h2 class="law-title">Prime Minister</h2>
-          </div>
-          <p class="law-meta">Head of government</p>
-        </div>
-        <div class="law-body">
-          <p>
-            Ensures all Ministers are doing their jobs and makes sure suggestions from Mayors and
-            Citizens are heard and acted on.
-          </p>
-        </div>
-      </article>
-
-      <article class="card law-card">
-        <div class="law-head">
-          <div>
-            <p class="law-marker">Role 3</p>
-            <h2 class="law-title">Minister of Finance</h2>
-          </div>
-          <p class="law-meta">Economy and budget</p>
-        </div>
-        <div class="law-body">
-          <p>
-            Manages the nation's money, sets the monthly national budget, and decides which towns
-            receive government grants or loans. Those decisions are then brought to the King for
-            final approval.
-          </p>
-        </div>
-      </article>
-
-      <article class="card law-card">
-        <div class="law-head">
-          <div>
-            <p class="law-marker">Role 4</p>
-            <h2 class="law-title">Minister of Public Works</h2>
-          </div>
-          <p class="law-meta">Labor and jobs</p>
-        </div>
-        <div class="law-body">
-          <p>
-            Makes sure there are job opportunities for citizens, assigns work to people, and sets
-            the pay for each job based on the budget.
-          </p>
-        </div>
-      </article>
-
-      <article class="card law-card">
-        <div class="law-head">
-          <div>
-            <p class="law-marker">Role 5</p>
-            <h2 class="law-title">Minister of Construction</h2>
-          </div>
-          <p class="law-meta">City planning</p>
-        </div>
-        <div class="law-body">
-          <p>
-            Creates the City Plan, including districts, buildings, and empty plots, and ensures
-            building materials are available and allocated to city projects.
-          </p>
-        </div>
-      </article>
-
-      <article class="card law-card">
-        <div class="law-head">
-          <div>
-            <p class="law-marker">Role 6</p>
-            <h2 class="law-title">Minister of Foreign Affairs</h2>
-          </div>
-          <p class="law-meta">Diplomacy</p>
-        </div>
-        <div class="law-body">
-          <p>
-            Handles relationships with other nations and keeps Panama Nation on good terms with
-            everyone.
-          </p>
-        </div>
-      </article>
-
-      <article class="card law-card">
-        <div class="law-head">
-          <div>
-            <p class="law-marker">Role 7</p>
-            <h2 class="law-title">Parliament Members</h2>
-          </div>
-          <p class="law-meta">Town representation</p>
-        </div>
-        <div class="law-body">
-          <p>
-            Appointed by their Town Mayor. Parliament Members are the only people eligible to
-            become Ministers.
-          </p>
-        </div>
-      </article>
-
-      <article class="card law-card">
-        <div class="law-head">
-          <div>
-            <p class="law-marker">Role 8</p>
-            <h2 class="law-title">Mayor</h2>
-          </div>
-          <p class="law-meta">Town leadership</p>
-        </div>
-        <div class="law-body">
-          <p>
-            Mayors own towns and can appoint their citizens to Parliament, either through a town
-            vote or directly.
-          </p>
-        </div>
-      </article>
     </section>
 
     <section class="card gov-notes">
