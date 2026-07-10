@@ -40,11 +40,11 @@ if (feed) {
       (shop) => `
         <article class="feed-item">
           <div>
-            <h3>${shop.name}</h3>
-            <p>${shop.owner} · ${shop.item}</p>
+            <h3>${escapeHtml(shop.name)}</h3>
+            <p>${escapeHtml(shop.owner)} · ${escapeHtml(shop.item)}</p>
           </div>
-          <div class="price">${shop.price}</div>
-          <p>${shop.note}</p>
+          <div class="price">${escapeHtml(shop.price)}</div>
+          <p>${escapeHtml(shop.note)}</p>
         </article>
       `,
     )
@@ -84,6 +84,7 @@ async function refreshAuth() {
           <strong>${escapeHtml(name)}</strong>
           <small>@${escapeHtml(data.user.username)}</small>
         </div>
+        <a class="btn btn-secondary auth-logout" href="/profile">Profile</a>
         <a class="btn btn-secondary auth-logout" href="/logout">Logout</a>
       </div>
     `;

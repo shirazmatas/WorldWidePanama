@@ -3,15 +3,48 @@ const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
 
+function loadDotEnv(filePath) {
+  if (!fs.existsSync(filePath)) return;
+
+  const contents = fs.readFileSync(filePath, "utf8");
+  for (const rawLine of contents.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+
+    const equalsIndex = line.indexOf("=");
+    if (equalsIndex <= 0) continue;
+
+    const key = line.slice(0, equalsIndex).trim();
+    let value = line.slice(equalsIndex + 1).trim();
+
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    if (!Object.prototype.hasOwnProperty.call(process.env, key)) {
+      process.env[key] = value;
+    }
+  }
+}
+
+loadDotEnv(path.join(__dirname, ".env"));
+
 const port = process.env.PORT || 3000;
 const root = __dirname;
 const discordClientId = process.env.DISCORD_CLIENT_ID || "";
 const discordClientSecret = process.env.DISCORD_CLIENT_SECRET || "";
+const discordBotToken = process.env.DISCORD_BOT_TOKEN || "";
+const discordGuildId = process.env.DISCORD_GUILD_ID || "";
+const discordNationRoleId = process.env.DISCORD_NATION_ROLE_ID || "";
 const discordRedirectUri =
   process.env.DISCORD_REDIRECT_URI || `http://localhost:${port}/auth/discord/callback`;
 const cookieName = "panama_session";
 const stateCookieName = "panama_oauth_state";
 const sessions = new Map();
+const guildRoleCache = new Map();
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -111,6 +144,56 @@ async function fetchDiscordUser(accessToken) {
   return response.json();
 }
 
+async function fetchDiscordGuildMember(userId) {
+  if (!discordBotToken || !discordGuildId) {
+    throw new Error("Discord bot lookup is not configured.");
+  }
+
+  const response = await fetch(
+    `https://discord.com/api/guilds/${discordGuildId}/members/${userId}`,
+    {
+      headers: {
+        Authorization: `Bot ${discordBotToken}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    if (response.status === 404) return null;
+    throw new Error(`Discord guild member fetch failed: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+async function fetchDiscordGuildRoles() {
+  if (!discordBotToken || !discordGuildId) {
+    throw new Error("Discord bot role lookup is not configured.");
+  }
+
+  const cached = guildRoleCache.get(discordGuildId);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.roles;
+  }
+
+  const response = await fetch(`https://discord.com/api/guilds/${discordGuildId}/roles`, {
+    headers: {
+      Authorization: `Bot ${discordBotToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Discord guild roles fetch failed: ${response.status}`);
+  }
+
+  const roles = await response.json();
+  guildRoleCache.set(discordGuildId, {
+    roles,
+    expiresAt: Date.now() + 5 * 60 * 1000,
+  });
+  return roles;
+}
+
 function send(res, statusCode, filePath) {
   const ext = path.extname(filePath).toLowerCase();
   const contentType = mimeTypes[ext] || "application/octet-stream";
@@ -144,6 +227,16 @@ function createSession(user, tokenData) {
   return sessionId;
 }
 
+function sessionToProfile(session) {
+  return {
+    id: session.user.id,
+    username: session.user.username,
+    global_name: session.user.global_name,
+    avatar: session.user.avatar,
+    discriminator: session.user.discriminator,
+  };
+}
+
 http
   .createServer(async (req, res) => {
     const urlPath = decodeURIComponent((req.url || "/").split("?")[0]);
@@ -155,8 +248,47 @@ http
       const session = getSession(req);
       sendJson(res, 200, {
         authenticated: Boolean(session),
-        user: session?.user || null,
+        user: session ? sessionToProfile(session) : null,
       });
+      return;
+    }
+
+    if (pathname === "/api/profile") {
+      const session = getSession(req);
+      if (!session) {
+        sendJson(res, 401, { error: "Not authenticated." });
+        return;
+      }
+
+      try {
+        const profile = sessionToProfile(session);
+        const member = await fetchDiscordGuildMember(profile.id);
+        const roles = member ? await fetchDiscordGuildRoles() : [];
+        const roleIds = member?.roles || [];
+        const resolvedRoles = roles
+          .filter((role) => roleIds.includes(role.id))
+          .map((role) => ({
+            id: role.id,
+            name: role.name,
+            color: role.color,
+          }));
+
+        sendJson(res, 200, {
+          user: profile,
+          guild: {
+            id: discordGuildId || null,
+            member: Boolean(member),
+            roles: resolvedRoles,
+            hasNationRole: discordNationRoleId
+              ? roleIds.includes(discordNationRoleId)
+              : null,
+          },
+        });
+      } catch (error) {
+        sendJson(res, 500, {
+          error: error.message || "Failed to load profile.",
+        });
+      }
       return;
     }
 
@@ -229,7 +361,7 @@ http
           },
         );
 
-        redirect(res, "/", {
+        redirect(res, "/profile", {
           "Set-Cookie": [
             serializeCookie(cookieName, sessionId, {
               maxAge: 7 * 24 * 60 * 60,
@@ -245,6 +377,17 @@ http
         });
         return;
       }
+    }
+
+    if (pathname === "/profile") {
+      const session = getSession(req);
+      if (!session) {
+        redirect(res, "/");
+        return;
+      }
+
+      send(res, 200, path.join(root, "profile.html"));
+      return;
     }
 
     const filePath = path.normalize(path.join(root, pathname));
