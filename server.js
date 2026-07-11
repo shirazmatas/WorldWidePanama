@@ -1,37 +1,14 @@
-const express = require("express");
-const cookieParser = require("cookie-parser");
-const fs = require("node:fs");
-const path = require("node:path");
-const crypto = require("node:crypto");
+import express from "express";
+import cookieParser from "cookie-parser";
+import path from "node:path";
+import crypto from "node:crypto";
+import { fileURLToPath } from "node:url";
+import * as dotenv from "dotenv";
 
-function loadDotEnv(filePath) {
-  if (!fs.existsSync(filePath)) return;
+dotenv.config();
 
-  const contents = fs.readFileSync(filePath, "utf8");
-  for (const rawLine of contents.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line || line.startsWith("#")) continue;
-
-    const equalsIndex = line.indexOf("=");
-    if (equalsIndex <= 0) continue;
-
-    const key = line.slice(0, equalsIndex).trim();
-    let value = line.slice(equalsIndex + 1).trim();
-
-    if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
-
-    if (!Object.prototype.hasOwnProperty.call(process.env, key)) {
-      process.env[key] = value;
-    }
-  }
-}
-
-loadDotEnv(path.join(__dirname, ".env"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const port = process.env.PORT || 3000;
 const root = __dirname;
@@ -51,13 +28,14 @@ const app = express();
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
-app.use(express.static(root));
+
+// Serve the static files from the React build directory
+app.use(express.static(path.join(__dirname, "dist")));
 
 // --- Helpers ---
 function getSession(req) {
   const sessionId = req.cookies.panama_session;
-  if (!sessionId) return null;
-  return sessions.get(sessionId) || null;
+  return sessionId ? sessions.get(sessionId) || null : null;
 }
 
 function sessionToProfile(session) {
@@ -66,7 +44,6 @@ function sessionToProfile(session) {
     username: session.user.username,
     global_name: session.user.global_name,
     avatar: session.user.avatar,
-    discriminator: session.user.discriminator,
   };
 }
 
@@ -156,69 +133,26 @@ async function fetchDiscordGuildRoles() {
   return roles;
 }
 
-// --- HTML Page Routes ---
-app.get("/", (req, res) => {
-  res.sendFile(path.join(root, "index.html"));
-});
-
-app.get("/laws", (req, res) => {
-  res.sendFile(path.join(root, "laws.html"));
-});
-
-app.get("/government-structure", (req, res) => {
-  res.sendFile(path.join(root, "government-structure.html"));
-});
-
-app.get("/profile", (req, res) => {
-  if (!getSession(req)) return res.redirect("/");
-  res.sendFile(path.join(root, "profile.html"));
-});
-
-// --- API Routes ---
-app.get("/api/me", (req, res) => {
-  const session = getSession(req);
-  res.json({
-    authenticated: Boolean(session),
-    user: session ? sessionToProfile(session) : null,
-  });
-});
-
-app.get("/api/profile", async (req, res) => {
-  const session = getSession(req);
-  if (!session) return res.status(401).json({ error: "Not authenticated." });
-
-  try {
-    const profile = sessionToProfile(session);
-    const member = await fetchDiscordGuildMember(profile.id);
-    const roles = member ? await fetchDiscordGuildRoles() : [];
-    const roleIds = member?.roles || [];
-    const resolvedRoles = roles
-        .filter((role) => roleIds.includes(role.id))
-        .map((role) => ({ id: role.id, name: role.name, color: role.color }));
-
-    res.json({
-      user: profile,
-      guild: {
-        id: discordGuildId || null,
-        member: Boolean(member),
-        roles: resolvedRoles,
-        hasNationRole: discordNationRoleId ? roleIds.includes(discordNationRoleId) : null,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message || "Failed to load profile." });
-  }
-});
-
 // --- Auth Routes ---
-app.get("/logout", (req, res) => {
+app.get("/api/auth/discord", (req, res) => {
   const secure = req.headers["x-forwarded-proto"] === "https";
-  res.clearCookie("panama_session", { path: "/", sameSite: "Lax", secure });
-  res.clearCookie("panama_oauth_state", { path: "/", sameSite: "Lax", secure });
-  res.redirect("/");
+  const state = crypto.randomBytes(24).toString("hex");
+  const authorizeUrl = new URL("https://discord.com/oauth2/authorize");
+
+  authorizeUrl.search = new URLSearchParams({
+    response_type: "code",
+    client_id: discordClientId,
+    scope: "identify",
+    state,
+    redirect_uri: discordRedirectUri,
+    prompt: "consent",
+  }).toString();
+
+  res.cookie("panama_oauth_state", state, { maxAge: 10 * 60 * 1000, httpOnly: true, sameSite: "Lax", secure });
+  res.redirect(authorizeUrl.toString());
 });
 
-app.get("/auth/discord", (req, res) => {
+app.get("/api/auth/discord/callback", async (req, res) => {
   if (!discordClientId || !discordClientSecret) {
     return res.status(500).json({ error: "Discord OAuth is not configured." });
   }
@@ -236,49 +170,22 @@ app.get("/auth/discord", (req, res) => {
   }).toString();
 
   res.cookie("panama_oauth_state", state, { maxAge: 10 * 60 * 1000, httpOnly: true, sameSite: "Lax", secure });
-  res.redirect(authorizeUrl.toString());
+  res.redirect("/profile");
 });
 
-app.get("/auth/discord/callback", async (req, res) => {
-  try {
-    const { code, state } = req.query;
-    const expectedState = req.cookies.panama_oauth_state;
-    const secure = req.headers["x-forwarded-proto"] === "https";
-
-    if (!code || !state || !expectedState || state !== expectedState) {
-      return res.status(400).json({ error: "Invalid OAuth callback state." });
-    }
-
-    const tokenData = await exchangeDiscordCode(code);
-    const user = await fetchDiscordUser(tokenData.access_token);
-    const sessionId = crypto.randomUUID();
-
-    sessions.set(sessionId, {
-      user: {
-        id: user.id,
-        username: user.username,
-        global_name: user.global_name || null,
-        avatar: user.avatar || null,
-        discriminator: user.discriminator || null,
-      },
-      tokenData,
-      createdAt: Date.now(),
-    });
-
-    res.cookie("panama_session", sessionId, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: "Lax", secure });
-    res.clearCookie("panama_oauth_state", { path: "/", sameSite: "Lax", secure });
-    res.redirect("/profile");
-  } catch (error) {
-    res.status(500).json({ error: "Discord OAuth callback failed." });
-  }
+app.get("/api/logout", (req, res) => {
+  const secure = req.headers["x-forwarded-proto"] === "https";
+  res.clearCookie("panama_session", { path: "/", sameSite: "Lax", secure });
+  res.clearCookie("panama_oauth_state", { path: "/", sameSite: "Lax", secure });
+  res.redirect("/");
 });
 
-// Fallback: If no explicit route matches and no static file exists
-app.get(/(.*)/, (req, res) => {
-  res.sendFile(path.join(root, "index.html"));
+// --- Catch-All for React Router ---
+// Any route not caught by /api will serve the React app
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
-// Start Server
 app.listen(port, () => {
-  console.log(`Express site running at http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
