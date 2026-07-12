@@ -182,7 +182,7 @@ app.get("/api/logout", (req, res) => {
 
 // --- Catch-All for React Router ---
 // Any route not caught by /api will serve the React app
-app.get("*", (req, res) => {
+app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 

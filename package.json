@@ -1,18 +1,16 @@
 {
-  "name": "minecraft-website",
+  "name": "panama-nation-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Express API for Panama Nation",
   "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "cookie-parser": "^1.4.7",
-    "express": "^5.2.1",
-    "react-router-dom": "^7.18.1"
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1"
   }
 }
